@@ -1,0 +1,15 @@
+version: '3'
+services:
+  nginx:
+    image: 659106128818.dkr.ecr.us-east-1.amazonaws.com/emp-core-container-registry:nginx-template
+    container_name: nginx
+    environment:
+      - NGINX_HOST=php
+    ports:
+      - "8000:80"
+    depends_on:
+      - "php"
+  php:
+    build: .
+    container_name: php
+    command: ["php-fpm"]

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- https://phpunit.readthedocs.io/en/latest/configuration.html -->
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" backupGlobals="false" colors="true" bootstrap="tests/bootstrap.php" cacheDirectory=".phpunit.cache">
+  <coverage/>
+  <php>
+    <ini name="error_reporting" value="-1"/>
+    <server name="APP_ENV" value="test" force="true"/>
+    <server name="SHELL_VERBOSITY" value="-1"/>
+    <server name="SYMFONY_PHPUNIT_REMOVE" value=""/>
+    <server name="SYMFONY_PHPUNIT_VERSION" value="7.5"/>
+    <server name="KERNEL_CLASS" value="App\Kernel"/>
+    <env name="APP_ENV" value="test"/>
+    <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled"/>
+    <env name="GHCI" value="1"/>
+    <env name="DB_USERNAME" value="root"/>
+    <env name="CLIENT" value="chargebacks911"/>
+    <env name="DB_PASSWORD" value="password"/>
+    <env name="DB_NAME" value="emp_config"/>
+    <env name="DB_HOSTNAME" value="empmysql"/>
+    <env name="READ_DB_HOSTNAME" value="empmysql"/>
+    <env name="EMP_users_URL" value="http://empusers/"/>
+    <env name="EMP_case_ECS_URL" value="http://empcase/"/>
+    <env name="SQS_doc_transport_lambda" value="testvalue"/>
+    <env name="REGION" value="us-east-1"/>
+    <env name="CLIENT" value="random_value"/>
+  </php>
+  <testsuites>
+    <testsuite name="Project Test Suite">
+      <directory>tests</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+  </source>
+</phpunit>

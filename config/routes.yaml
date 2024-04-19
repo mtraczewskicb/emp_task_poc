@@ -1,0 +1,3 @@
+emp_core_routes:
+    resource: '@EmpCoreBundle/Resources/config/routes.yaml'
+

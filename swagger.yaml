@@ -1,0 +1,615 @@
+openapi: 3.0.3
+info:
+  title: EMP Config
+  version: '2.7'
+tags:
+  - name: Config
+  - name: Config Groups
+  - name: Config Schemas
+servers:
+  - url: http://empconfig.localhost
+    description: Local
+
+paths:
+  /config/cfg:
+    get:
+      summary: Get configurations
+      tags: ["Config"]
+      parameters:
+        - in: query
+          name: id
+          required: false
+          schema:
+            $ref: '#/components/schemas/ConfigID'
+        - in: query
+          name: grp_id
+          required: false
+          schema:
+            $ref: '#/components/schemas/GroupID'
+        - in: query
+          name: name
+          required: false
+          schema:
+            $ref: '#/components/schemas/ConfigName'
+        - in: query
+          name: attr
+          required: false
+          schema:
+            $ref: '#/components/schemas/AttributesQuery'
+        - in: query
+          name: user_id
+          required: false
+          schema:
+            $ref: '#/components/schemas/UserID'
+        - in: query
+          name: date_created
+          required: false
+          schema:
+            $ref: '#/components/schemas/DateCreated'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Configs'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Errors'
+    post:
+      summary: Add configuration
+      tags: ["Config"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigPost'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              description: link to newly created Config
+              schema:
+                type: string
+              example: /config/cfg/1
+        '400':
+          $ref: '#/components/schemas/Errors'
+  /config/cfg/{configID}:
+    get:
+      summary: Get configuration
+      tags: ["Config"]
+      parameters:
+        - name: configID
+          in: path
+          description: ConfigId or Alias
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '404':
+          description: Not found
+    patch:
+      summary: Update a config item
+      tags: ["Config"]
+      parameters:
+        - name: configID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigPatch'
+      responses:
+        '204':
+          description: Updated
+        '400':
+          $ref: '#/components/schemas/Errors'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete a config item
+      tags: ["Config"]
+      parameters:
+        - name: configID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+  /config/groups:
+    get:
+      summary: Get config groups
+      tags: ["Config Groups"]
+      parameters:
+        - in: query
+          name: start
+          required: false
+          schema:
+            $ref: '#/components/schemas/QueryStart'
+        - in: query
+          name: limit
+          required: false
+          schema:
+            $ref: '#/components/schemas/QueryLimit'
+        - in: query
+          name: search
+          required: false
+          schema:
+            $ref: '#/components/schemas/QuerySearch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  pagination:
+                    $ref: '#/components/schemas/ResponsePagination'
+    post:
+      summary: Add a group
+      tags: ["Config Groups"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  $ref: '#/components/schemas/GroupName'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              description: link to newly created Group
+              schema:
+                type: string
+              example: /config/group/1
+        '400':
+          $ref: '#/components/schemas/Errors'
+  /config/groups/{groupID}:
+    get:
+      summary: Get config items for a group
+      tags: ["Config Groups"]
+      parameters:
+        - name: groupID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '404':
+          description: Not found
+    patch:
+      summary: Update group name
+      tags: ["Config Groups"]
+      parameters:
+        - name: groupID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  $ref: '#/components/schemas/GroupName'
+      responses:
+        '204':
+          description: Updated
+        '400':
+          $ref: '#/components/schemas/Errors'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete a group
+      tags: ["Config Groups"]
+      parameters:
+        - name: groupID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+        '405':
+          description: Method not allowed if group has items
+  /config/schemas:
+    get:
+      summary: Get schemas
+      tags: ["Config Schemas"]
+      parameters:
+        - in: query
+          name: start
+          required: false
+          schema:
+            $ref: '#/components/schemas/QueryStart'
+        - in: query
+          name: limit
+          required: false
+          schema:
+            $ref: '#/components/schemas/QueryLimit'
+        - in: query
+          name: search
+          required: false
+          schema:
+            $ref: '#/components/schemas/QuerySearch'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      allOf:
+                        - type: object
+                          properties:
+                            id:
+                              $ref: '#/components/schemas/JsonSchemaID'
+                            schema:
+                              $ref: '#/components/schemas/JsonSchema'
+
+                  pagination:
+                    $ref: '#/components/schemas/ResponsePagination'
+    post:
+      summary: Add a schema
+      tags: ["Config Schemas"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                schema:
+                  $ref: '#/components/schemas/JsonSchema'
+
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              description: link to newly created Schema
+              schema:
+                type: string
+              example: /config/schema/1
+        '400':
+          $ref: '#/components/schemas/Errors'
+  /config/schemas/{schemaID}:
+    get:
+      summary: Get schema
+      tags: ["Config Schemas"]
+      parameters:
+        - name: schemaID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/JsonSchemaID'
+                  schema:
+                    $ref: '#/components/schemas/JsonSchema'
+        '404':
+          description: Not found
+    patch:
+      summary: Update schema
+      tags: ["Config Schemas"]
+      parameters:
+        - name: schemaID
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                schema:
+                  $ref: '#/components/schemas/JsonSchema'
+      responses:
+        '204':
+          description: Updated
+        '400':
+          $ref: '#/components/schemas/Errors'
+        '404':
+          description: Not found
+    delete:
+      summary: Delete a schema
+      tags: ["Config Schemas"]
+      parameters:
+        - name: schemaID
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Deleted
+        '404':
+          description: Not found
+        '405':
+          description: Method not allowed if currently used by a config item
+components:
+  schemas:
+    Attributes:
+      description: Valid JSON config
+      type: string
+      example: |
+        { "endpoint": "/cm/cases", "columns": [ { "prop": "merchant", "header": "Merchant", "sortable": true, "style": "font-weight:bold;color:#ff0000;", "tooltip": "Merchant Name", "width": "auto", "wrap": true }, { "prop": "arn", "header": "ARN", "sortable": true, "style": null, "tooltip": "ARN", "width": "100", "wrap": false } ] }
+    AttributesQuery:
+      description: base64 encoded JSON query
+      type: string
+      example: 'eyJjb2xvciI6ICJCbGFjayJ9'
+    Config:
+      description: Config object
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ConfigID'
+        name:
+          $ref: '#/components/schemas/ConfigName'
+        alias:
+          $ref: '#/components/schemas/ConfigAlias'
+        grp_id:
+          $ref: '#/components/schemas/GroupID'
+        grp_name:
+          $ref: '#/components/schemas/GroupName'
+        attr:
+          $ref: '#/components/schemas/Attributes'
+        history:
+          type: array
+          items:
+            $ref: '#/components/schemas/History'
+        schema_id:
+          $ref: '#/components/schemas/JsonSchemaID'
+        schema:
+          $ref: '#/components/schemas/JsonSchema'
+        created_by:
+          $ref: '#/components/schemas/CreatedBy'
+        date_created:
+          $ref: '#/components/schemas/DateCreated'
+        date_updated:
+          $ref: '#/components/schemas/DateUpdated'
+    ConfigAlias:
+      description: Short unique alias for config
+      type: string
+      pattern: '^[_a-zA-Z0-9]+$'
+      example: 'cb_grid'
+    ConfigName:
+      description: Config name
+      type: string
+      example: 'CB Data Grid'
+    ConfigID:
+      description: Config id
+      type: integer
+      example: 15
+    ConfigPatch:
+      type: object
+      properties:
+        grp_id:
+          $ref: '#/components/schemas/GroupID'
+        name:
+          $ref: '#/components/schemas/ConfigName'
+        alias:
+          $ref: '#/components/schemas/ConfigAlias'
+        attr:
+          $ref: '#/components/schemas/Attributes'
+        schema_id:
+          $ref: '#/components/schemas/SchemaID'
+    ConfigPost:
+      type: object
+      properties:
+        grp_id:
+          $ref: '#/components/schemas/GroupID'
+        name:
+          $ref: '#/components/schemas/ConfigName'
+        alias:
+          $ref: '#/components/schemas/ConfigAlias'
+        attr:
+          $ref: '#/components/schemas/Attributes'
+        schema_id:
+          $ref: '#/components/schemas/SchemaID'
+    Configs:
+      description: Config response
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Config'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    CreatedBy:
+      description: Config created by
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UserID'
+        username:
+          $ref: '#/components/schemas/Username'
+        user:
+          $ref: '#/components/schemas/User'
+    DateCreated:
+      description: Creation timestamp
+      type: string
+      pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$'
+      example: '2022-06-01 08:52:07'
+    DateUpdated:
+      description: The timestamp showing the last update
+      type: string
+      pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$'
+      example: '2022-06-13 16:43:20'
+    Errors:
+      description: Error response
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Config ID does not exist
+    Group:
+      description: Config group
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/GroupID'
+        name:
+          $ref: '#/components/schemas/GroupName'
+        date_created:
+          $ref: '#/components/schemas/DateCreated'
+    GroupID:
+      description: Config group id
+      type: integer
+      example: 3
+    SchemaID:
+      description: Config Schema id
+      type: integer
+      example: 3
+    GroupName:
+      description: Config group name
+      type: string
+      example: 'Dashboard Page'
+    History:
+      type: object
+      properties:
+        user_id:
+          $ref: '#/components/schemas/UserID'
+        username:
+          $ref: '#/components/schemas/Username'
+        action_id:
+          $ref: '#/components/schemas/HistoryActionID'
+        action_name:
+          $ref: '#/components/schemas/HistoryActionName'
+        date_created:
+          $ref: '#/components/schemas/DateCreated'
+    HistoryActionID:
+      description: History action id
+      type: integer
+      example: 2
+    HistoryActionName:
+      description: Config history action
+      type: string
+      example: delete
+    JsonSchema:
+      description: Optional Valid JSON schema to validate the configuration when create/update
+      type: string
+      default: null
+      example: |
+        { "definitions": {}, "$schema": "http://json-schema.org/draft-07/schema#", "$id": "https://example.com/object1656637337.json", "title": "Root", "type": "object", "required": [ "endpoint", "columns" ], "properties": { "endpoint": { "$id": "#root/endpoint", "title": "Endpoint", "type": "string", "default": "", "examples": [ "/cm/cases" ], "pattern": "^.*$" }, "columns": { "$id": "#root/columns", "title": "Columns", "type": "array", "default": [], "items":{ "$id": "#root/columns/items", "title": "Items", "type": "object", "required": [ "prop", "header", "sortable", "width", "wrap" ], "properties": { "prop": { "$id": "#root/columns/items/prop", "title": "Prop", "type": "string", "default": "", "examples": [ "merchant" ], "pattern": "^.*$" }, "header": { "$id": "#root/columns/items/header", "title": "Header", "type": "string", "default": "", "examples": [ "Merchant" ], "pattern": "^.*$" }, "sortable": { "$id": "#root/columns/items/sortable", "title": "Sortable", "type": "boolean", "examples": [ true ], "default": true }, "style": { "$id": "#root/columns/items/style", "title": "Style", "type": "string", "default": "", "examples": [ "font-weight:bold;color:#ff0000;" ], "pattern": "^.*$" }, "tooltip": { "$id": "#root/columns/items/tooltip", "title": "Tooltip", "type": "string", "default": "", "examples": [ "Merchant Name" ], "pattern": "^.*$" }, "width": { "$id": "#root/columns/items/width", "title": "Width", "type": "string", "default": "", "examples": [ "auto" ], "pattern": "^.*$" }, "wrap": { "$id": "#root/columns/items/wrap", "title": "Wrap", "type": "boolean", "examples": [ true ], "default": true } } } } } }
+    JsonSchemaID:
+      description: Config schema id
+      type: integer
+      default: null
+      example: 6
+    Pagination:
+      description: Data set pagination
+      type: object
+      properties:
+        start:
+          type: integer
+          example: 0
+        limit:
+          type: integer
+          example: 25
+        total:
+          type: integer
+          example: 75
+    QueryStart:
+      description: Pagination start
+      type: integer
+      example: 0
+    QueryLimit:
+      description: Pagination limit
+      type: integer
+      example: 25
+    QuerySearch:
+      description: Pagination search
+      type: string
+    User:
+      description: User first and last name
+      type: string
+      example: John Doe
+    UserID:
+      description: User id
+      type: integer
+      example: 4
+    Username:
+      description: Username
+      type: string
+      example: johndoe
+    ResponsePagination:
+      type: object
+      properties:
+        start:
+          type: integer
+          example: 0
+        limit:
+          type: integer
+          example: 50
+        total:
+          type: integer
+          example: 75
+
+  responses:
+    400:
+      description: Bad request
+
